@@ -2,5 +2,5 @@ pom-generated.xml
 Manifest.txt
 simplest.jar
 lib
-classes
+target
 *~
