@@ -1,15 +1,3 @@
 # simplest
 
-FIXME: write description
-
-## Usage
-
-FIXME: write
-
-## Installation
-
-FIXME: write
-
-## License
-
-FIXME: write
+This is a bare-bones servlet written in Clojure, using Leiningen to compile the code, and Maven to deploy it as a war file.
