@@ -1,3 +1,89 @@
 # simplest
 
-This is a bare-bones servlet written in Clojure, using Leiningen to compile the code, and Maven to deploy it as a war file.
+This is a bare-bones servlet written in Clojure, using Leiningen to
+compile the code, and Maven to deploy it as a war file.
+
+Here's the basic recipe I followed.
+
+* Start a new project with Leiningen (I'm using Leiningen 1.0.1):
+
+  $ lein new simplest
+
+* Add your servlet. I put mine in 'src/simplest/servlet.clj':
+
+  (ns simplest.servlet           
+      (:import (java.util Date))
+      (:gen-class :extends javax.servlet.http.HttpServlet))
+
+  (defn -doGet [this req resp]
+       ...)
+
+* Add your dependencies to the project file. I added
+  [javax.servlet/servlet-api "2.5"].
+
+* Set the :compile-path, so that the classfiles end up where Maven
+  will expect to see them:
+  
+  (defproject simplest "1.0.0-SNAPSHOT"
+     :compile-path "target/classes"
+     ...)
+
+* Compile it with Leiningen, to make sure there aren't any errors:
+
+  $ lein compile
+  [copy] Copying 3 files to /tmp/simplest/lib
+  Compiling simplest
+  Compiling simplest.servlet
+
+* Add the web.xml file, and whatever other static resources you want
+  under 'src/main'. I added:
+
+  src/main/webapp/WEB-INF/web.xml
+  src/main/webapp/index.html
+
+  My web.xml is basic:
+
+   <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   	xmlns="http://java.sun.com/xml/ns/javaee"
+   	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+   	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+   	id="simplest"
+   	version="2.5">
+     <display-name>Simplest Clojure Servlet</display-name>
+     <servlet>
+       <servlet-name>simplest</servlet-name>
+       <servlet-class>simplest.servlet</servlet-class>
+     </servlet>
+     <servlet-mapping>
+       <servlet-name>simplest</servlet-name>
+       <url-pattern>/simplest/</url-pattern>
+     </servlet-mapping>
+     <welcome-file-list>
+   	  <welcome-file>index.html</welcome-file>
+     </welcome-file-list>
+   </web-app>
+
+* Make your POM file for Maven:
+
+  $ lein pom
+  Wrote pom.xml
+
+* Generate the WAR file:
+
+  $ lein compile; mvn war:war
+  ....
+  $ ls target/*.war
+  target/simplest-1.0.0-SNAPSHOT.war
+
+* If you want, you can add a 'Jetty plugin' to your pom.xml, which
+  will let Maven run your servlet(s) for you in a standalone Web
+  server, for testing:
+
+  Edit pom.xml: see
+  http://github.com/gmfawcett/simplest/commit/44d978c55ae02112647a743b6f957156787fba25
+
+  $ lein compile; mvn jetty:run
+
+* Note, the 'lein compile' in the line above isn't strictly necessary,
+  but since Maven won't know how to compile your Clojure files, it's a
+  good idea to always call 'lein compile' before a Maven task.
